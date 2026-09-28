@@ -1,0 +1,15 @@
+cff-version: 1.2.0
+message: "If you use EGSA or its datasets, please cite the associated paper."
+title: "EGSA: Edge-Guided Supervision Allocation for Neural Surface Reconstruction in Architectural Scenes"
+type: software
+authors:
+  - family-names: Luo
+    given-names: Yi
+  - family-names: Giani
+    given-names: Stefano
+  - family-names: James
+    given-names: Stuart
+  - family-names: Ninić
+    given-names: Jelena
+repository-code: "https://github.com/Roy233333/EGSA-release"
+license: Apache-2.0

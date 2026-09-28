@@ -1,0 +1,3 @@
+# EGSA dependencies in addition to the upstream SDFStudio environment.
+# Tested with Python 3.9 / PyTorch 1.12.1; includes both edge-prior options.
+kornia==0.6.12

@@ -1,0 +1,16 @@
+EGSA
+
+This distribution contains modifications to SDFStudio and Nerfstudio source
+files. SDFStudio and Nerfstudio are distributed under the Apache License 2.0.
+The original copyright and licence headers in derived source files are retained.
+
+The bundled training source is based on SDFStudio revision
+370902a10dbef08cb3fe4391bd3ed1e227b5c165. EGSA adds edge priors, EMA hardness
+updates and adaptive feedback, and modifies the pixel sampler, data manager
+and training pipeline. Upstream model implementations are retained.
+
+Upstream SDFStudio:
+https://github.com/autonomousvision/sdfstudio
+
+The dataset assets are separate works and are subject to the terms stated in
+docs/DATASETS.md and in the corresponding GitHub Release.
