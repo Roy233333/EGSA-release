@@ -26,12 +26,15 @@ python scripts/check_environment.py --require-cuda
 
 ## Training
 
-Extract a dataset archive and set its path below. Run from this repository's
-root with the installed environment activated:
+Extract a dataset archive and replace `<PATH_TO_DATASET>` with the actual
+directory containing `meta_data.json`. This can be an absolute path on any
+drive or a path relative to the repository root; no particular drive is required.
+Run from this repository's root with the installed environment activated.
+For W&B logging, run `wandb login` once before training:
 
 ```powershell
 python -m scripts.train neus-facto `
-  --vis tensorboard `
+  --vis wandb `
   --machine.seed 42 `
   --pipeline.datamanager.sampler-type adaptive `
   --pipeline.datamanager.adaptive-edge-type sobel `
@@ -41,16 +44,12 @@ python -m scripts.train neus-facto `
   --pipeline.datamanager.adaptive-hardness-enabled True `
   --pipeline.datamanager.adaptive-block-size 8 `
   --pipeline.datamanager.adaptive-blockwise-exact False `
-  sdfstudio-data --data "C:\datasets\Scene1" `
+  sdfstudio-data --data "<PATH_TO_DATASET>" `
   --include-mono-prior False --load-pairs False
 ```
 
-This is a training example using the backbone's default optimisation schedule,
-not an exact configuration for every paper result. The inherited parser permits
-training/evaluation view overlap. For a new held-out experiment, append
-`--skip-every-for-val-split 8 --train-val-no-overlap True` after `sdfstudio-data`,
-and use the same split for all methods. See [training options](docs/TRAINING.md)
-for other scenes, backbones and the uniform baseline.
+This example uses the backbone's default training configuration. See
+[training options](docs/TRAINING.md) for sampler variants and dataset settings.
 
 ## Data and ground truth
 
@@ -68,14 +67,22 @@ Downloads are distributed as ZIP assets in
 See [data contents, preprocessing and terms](docs/DATASETS.md). GT refers to
 reference point clouds, not a table of reported reconstruction scores.
 
-## Geometric evaluation
+## Evaluation
 
-Following the paper, meshes are sampled, cleaned, aligned to the LiDAR
-reference and restricted to a common overlap region. Chamfer, Median and P95
-are computed from the combined **unsquared** bidirectional nearest-neighbour
-distances and reported in millimetres. See the concise
-[evaluation protocol](docs/EVALUATION.md). Custom geometry-scoring scripts,
-historical results, training logs and checkpoints are not included.
+### Image quality
+
+SDFStudio computes PSNR, SSIM and LPIPS and supports W&B logging through
+`--vis wandb`, as in the training example. View and compare the logged metrics
+in W&B, using matched evaluation views, training steps and aggregation settings.
+Use `--vis tensorboard` instead if W&B is not needed.
+
+### Geometry accuracy
+
+Compare reconstructed geometry with the supplied LiDAR references after
+preprocessing, alignment and overlap filtering. Report Chamfer Distance, Median
+and P95 according to the paper's **Evaluation Protocol — Geometric Accuracy**
+section, which provides the detailed procedure and metric definitions.
+Custom geometry-evaluation scripts are not included.
 
 ## Code layout
 

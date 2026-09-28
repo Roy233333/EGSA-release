@@ -24,49 +24,30 @@ fixed when comparing samplers. In the same training command, change only:
 | Canny prior | `--pipeline.datamanager.adaptive-edge-type canny` |
 | No edge prior | `--pipeline.datamanager.adaptive-edge-weight 0` |
 | No hardness feedback | `--pipeline.datamanager.adaptive-hardness-enabled False` |
-| No EMA smoothing | `--pipeline.datamanager.adaptive-ema-decay 0` |
+| Latest-error hardness (no temporal smoothing) | `--pipeline.datamanager.adaptive-ema-decay 0` |
 | Pixel-level sampling | `--pipeline.datamanager.adaptive-block-size 1` |
 
-No EMA smoothing is not the same as disabling hardness. The Canny option uses
+With EMA decay 0, each visited pixel's hardness is replaced by its latest
+photometric error; unvisited pixels retain their values. Hardness feedback
+remains active. To disable it, use `adaptive-hardness-enabled False`.
+The Canny option uses
 Kornia 0.6.12's normalised non-maximum-suppressed magnitude, not its binary
 hysteresis output. It is installed with the training dependencies.
 
 ## Scenes and backbones
 
-Replace `--data` with the extracted scene directory containing `meta_data.json`.
+Replace `<PATH_TO_DATASET>` in `--data "<PATH_TO_DATASET>"` with the actual
+extracted scene directory containing `meta_data.json`, wherever it is stored.
 Scene1, Scene2 and Scene3 include monocular depth/normal priors; use
 `--include-mono-prior True` only with a model/loss configuration that uses them.
 Scene1-HR and Scene4 have no such priors: use `--include-mono-prior False`.
 Keep `--load-pairs False` for these examples.
 
 Available SDF backbones include `neus`, `neus-facto`, `neus-facto-angelo`,
-`monosdf`, `volsdf` and `bakedsdf`. Replace `neus-facto` in the README command
-and inspect the corresponding `--help`; changing backbone also changes its
-default model and optimisation settings. Scene4 uses `neus-facto-angelo` in
-the paper. Ray counts and iteration budgets can be set before the data parser:
+`monosdf`, `volsdf` and `bakedsdf`.
 
-```powershell
---pipeline.datamanager.train-num-rays-per-batch 2048 `
---trainer.max-num-iterations 100000
-```
-
-These values illustrate CLI usage; use the paper's budget for the particular
-experiment rather than applying one budget to all scenes and backbones.
-
-## Evaluation views
-
-The inherited parser defaults to `train_val_no_overlap=False`. Evaluation
-images can therefore also be training images. For a new disjoint split, append:
-
-```powershell
---skip-every-for-val-split 8 --train-val-no-overlap True
-```
-
-These are parser options and must follow `sdfstudio-data`. This selects every
-eighth frame for evaluation and excludes those frames from training. This
-example does not establish the split used by an existing paper run. W&B records
-metrics produced by the trainer; a last logged value is not automatically a
-whole-held-out-set average.
+Training/evaluation splits follow the SDFStudio parser settings; its default
+`train_val_no_overlap=False` permits overlapping views.
 
 ## Implementation scope
 

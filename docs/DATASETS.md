@@ -43,7 +43,7 @@ density. Use the same reference and common region across compared methods.
 There is no separate Scene1-HR GT package and no Scene4 geometry GT in this
 distribution. Verify coordinate units and transforms before scoring; these
 reference inputs are not automatically the final aligned/cropped point sets
-for every result. See [evaluation](EVALUATION.md).
+for every result. See [evaluation](../README.md#evaluation).
 
 ## Integrity checks (optional)
 
