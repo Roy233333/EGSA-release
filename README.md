@@ -82,7 +82,6 @@ Compare reconstructed geometry with the supplied LiDAR references after
 preprocessing, alignment and overlap filtering. Report Chamfer Distance, Median
 and P95 according to the paper's **Evaluation Protocol — Geometric Accuracy**
 section, which provides the detailed procedure and metric definitions.
-Custom geometry-evaluation scripts are not included.
 
 ## Code layout
 
