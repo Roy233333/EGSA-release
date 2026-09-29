@@ -11,7 +11,7 @@ $env:PYTHONIOENCODING = "utf-8"
 
 ## Sampler settings
 
-The README example explicitly sets the paper's default sampler settings:
+The EGSA options listed in the README set the paper's default sampler settings:
 Sobel, edge exponent 1.3, uniform mixture 0.6, EMA decay 0.9, hardness enabled,
 block size 8, and uniform sampling within allocated cells.
 
@@ -29,12 +29,12 @@ fixed when comparing samplers. In the same training command, change only:
 
 ## Scenes and backbones
 
-Replace `<PATH_TO_DATASET>` in `--data "<PATH_TO_DATASET>"` with the actual
-extracted scene directory containing `meta_data.json`, wherever it is stored.
+Keep `--data` pointed at the actual extracted scene directory containing
+`meta_data.json`, wherever it is stored.
 Scene1, Scene2 and Scene3 include monocular depth/normal priors; use
 `--include-mono-prior True` only with a model/loss configuration that uses them.
 Scene1-HR and Scene4 have no such priors: use `--include-mono-prior False`.
-Keep `--load-pairs False` for these examples.
+Use `--load-pairs False` for the released datasets.
 
 Available SDF backbones include `neus`, `neus-facto`, `neus-facto-angelo`,
 `monosdf`, `volsdf` and `bakedsdf`.

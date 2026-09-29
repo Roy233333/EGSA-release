@@ -26,30 +26,26 @@ python scripts/check_environment.py --require-cuda
 
 ## Training
 
-Extract a dataset archive and replace `<PATH_TO_DATASET>` with the actual
-directory containing `meta_data.json`. This can be an absolute path on any
-drive or a path relative to the repository root; no particular drive is required.
-Run from this repository's root with the installed environment activated.
-For W&B logging, run `wandb login` once before training:
+Start from a working SDFStudio training command, using this repository's
+EGSA-integrated code installed as described above. Add the following EGSA
+options before the data-parser subcommand (e.g. `sdfstudio-data`). These are
+arguments to insert into your existing command, not a standalone command:
 
-```powershell
-python -m scripts.train neus-facto `
-  --vis wandb `
-  --machine.seed 42 `
-  --pipeline.datamanager.sampler-type adaptive `
-  --pipeline.datamanager.adaptive-edge-type sobel `
-  --pipeline.datamanager.adaptive-edge-weight 1.3 `
-  --pipeline.datamanager.adaptive-uniform-mix 0.6 `
-  --pipeline.datamanager.adaptive-ema-decay 0.9 `
-  --pipeline.datamanager.adaptive-hardness-enabled True `
-  --pipeline.datamanager.adaptive-block-size 8 `
-  --pipeline.datamanager.adaptive-blockwise-exact False `
-  sdfstudio-data --data "<PATH_TO_DATASET>" `
-  --include-mono-prior False --load-pairs False
+```text
+--pipeline.datamanager.sampler-type adaptive
+--pipeline.datamanager.adaptive-edge-type sobel
+--pipeline.datamanager.adaptive-edge-weight 1.3
+--pipeline.datamanager.adaptive-uniform-mix 0.6
+--pipeline.datamanager.adaptive-ema-decay 0.9
+--pipeline.datamanager.adaptive-hardness-enabled True
+--pipeline.datamanager.adaptive-block-size 8
+--pipeline.datamanager.adaptive-blockwise-exact False
 ```
 
-This example uses the backbone's default training configuration. See
-[training options](docs/TRAINING.md) for sampler variants and dataset settings.
+Keep your existing backbone, dataset path, ray budget, training schedule and
+other settings unchanged when comparing against uniform sampling. The
+unmodified upstream SDFStudio code does not recognise these EGSA options.
+See [training options](docs/TRAINING.md) for sampler variants and dataset settings.
 
 ## Data and ground truth
 
@@ -72,7 +68,7 @@ reference point clouds, not a table of reported reconstruction scores.
 ### Image quality
 
 SDFStudio computes PSNR, SSIM and LPIPS and supports W&B logging through
-`--vis wandb`, as in the training example. View and compare the logged metrics
+`--vis wandb`. Run `wandb login` once before using W&B. View and compare the logged metrics
 in W&B, using matched evaluation views, training steps and aggregation settings.
 Use `--vis tensorboard` instead if W&B is not needed.
 
