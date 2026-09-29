@@ -20,9 +20,12 @@ the dataset licence.
 Upstream lists 761 Huawei P20 Pro images at 540 x 960 and terrestrial laser
 scanner reference data. The selected EGSA input contains **380 RGB images at
 384 x 384**, SDFStudio camera metadata, and generated depth/normal arrays.
-The original-to-processed image mapping and crop/resize recipe are not
-included; no specific frame-selection rule is claimed.
-These are processed experimental inputs, not an unmodified mirror of NeRFBK.
+SDFStudio's official [conversion script](https://github.com/autonomousvision/sdfstudio/blob/master/scripts/datasets/process_nerfstudio_to_sdfstudio.py)
+provides this input resolution with `--mono-prior --crop-mult 1`: images are
+centre-cropped to a square, resized to 384 x 384 with bilinear interpolation,
+and camera intrinsics are adjusted accordingly. Image resizing and frame
+selection are separate steps; the released archive contains the 380-view
+processed subset, not all 761 upstream images.
 
 The original dataset and adaptations retain the applicable CC BY-NC-SA terms.
 This source licence does not establish redistribution rights for the added

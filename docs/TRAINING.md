@@ -27,13 +27,6 @@ fixed when comparing samplers. In the same training command, change only:
 | Latest-error hardness (no temporal smoothing) | `--pipeline.datamanager.adaptive-ema-decay 0` |
 | Pixel-level sampling | `--pipeline.datamanager.adaptive-block-size 1` |
 
-With EMA decay 0, each visited pixel's hardness is replaced by its latest
-photometric error; unvisited pixels retain their values. Hardness feedback
-remains active. To disable it, use `adaptive-hardness-enabled False`.
-The Canny option uses
-Kornia 0.6.12's normalised non-maximum-suppressed magnitude, not its binary
-hysteresis output. It is installed with the training dependencies.
-
 ## Scenes and backbones
 
 Replace `<PATH_TO_DATASET>` in `--data "<PATH_TO_DATASET>"` with the actual
