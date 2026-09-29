@@ -20,8 +20,6 @@ files in the scene directory; Scene1-HR/Scene4 store RGB under `images/`.
 No training logs or checkpoints are included.
 
 - Scene1-HR is the high-resolution runtime input for the same physical scene.
-  Its camera metadata/frame correspondence is not validated as a resolution-only
-  transformation of Scene1; do not assume changing image dimensions reproduces it.
 - Scene1-HR and Scene4 contain no monocular priors. Disable prior loading.
 - Keep optional view-pair loading disabled: Scene1 pair indexing is not validated;
   Scene2/3 specify `pairs: null`.
