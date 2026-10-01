@@ -51,6 +51,9 @@ See [training options](docs/TRAINING.md) for sampler variants and dataset settin
 
 Downloads are distributed as ZIP assets in
 [Releases](https://github.com/Roy233333/EGSA-release/releases).
+Training archives contain RGB images and camera metadata. Monocular depth/normal
+priors generated with Omnidata v2 are not distributed; see the
+[data guide](docs/DATASETS.md#monocular-priors) if your experiment requires them.
 
 | Training data | Images | Resolution | Geometry reference |
 |---|---:|---|---|

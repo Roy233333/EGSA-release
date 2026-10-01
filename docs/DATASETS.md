@@ -2,30 +2,50 @@
 
 ZIP archives are supplied separately from the training code in
 [Releases](https://github.com/Roy233333/EGSA-release/releases). Extract them
-outside the repository. Access currently remains restricted; code and data
-licences are separate.
+outside the repository. Code and data licences are separate; see
+[dataset terms](#dataset-terms).
 
 ## Training archives
 
 | Archive | Views | Resolution | Contents |
 |---|---:|---|---|
-| Scene1.zip | 328 | 384 × 384 | RGB, camera metadata, depth/normal priors, optional view pairs |
+| Scene1.zip | 328 | 384 × 384 | RGB, camera metadata, optional view pairs |
 | Scene1-HR.zip | 328 | 1280 × 720 | RGB and camera metadata |
-| Scene2.zip | 380 | 384 × 384 | RGB, camera metadata, depth/normal priors, NeRFBK attribution |
-| Scene3.zip | 157 | 384 × 384 | RGB, camera metadata, depth/normal priors |
+| Scene2.zip | 380 | 384 × 384 | RGB, camera metadata, NeRFBK attribution |
+| Scene3.zip | 157 | 384 × 384 | RGB and camera metadata |
 | Scene4.zip | 514 | 1920 × 1080 | Green-suppressed RGB, camera metadata and preprocessing notes |
 
-Every extracted scene contains `meta_data.json`. Scene1/2/3 have RGB and prior
+Every extracted scene contains `meta_data.json`. Scene1/2/3 have RGB
 files in the scene directory; Scene1-HR/Scene4 store RGB under `images/`.
 No training logs or checkpoints are included.
 
 - Scene1-HR is the high-resolution runtime input for the same physical scene.
-- Scene1-HR and Scene4 contain no monocular priors. Disable prior loading.
+- All distributed archives omit monocular priors. Disable prior loading unless
+  you have generated and configured the required files locally.
 - Keep optional view-pair loading disabled: Scene1 pair indexing is not validated;
   Scene2/3 specify `pairs: null`.
 - Scene4 retains the experiment's green suppression, not unmodified source RGB.
 - Scene2 is a processed 380-image subset, not the full 761-image source dataset.
   See [Scene2 attribution](SCENE2_ATTRIBUTION.md).
+
+## Monocular priors
+
+The depth and normal priors used for Scene1, Scene2 and Scene3 were generated
+with **Omnidata v2** through SDFStudio's preprocessing workflow. These predicted
+priors are not distributed in this release; they are not measured ground truth.
+RGB images, frame order, camera calibration and coordinate transforms are
+preserved. The distributed metadata sets `has_mono_prior` to `false` and omits
+references to the excluded files.
+
+For experiments that use these priors, obtain the models from
+[Omnidata](https://github.com/EPFL-VILAB/omnidata) under their applicable terms and
+generate depth and normals locally using
+[SDFStudio's monocular-cue extraction script](https://github.com/autonomousvision/sdfstudio/blob/370902a10dbef08cb3fe4391bd3ed1e227b5c165/scripts/datasets/extract_monocular_cues.py).
+Use the provided RGB images without repeating the crop/resize or changing camera
+poses. Add each frame's `mono_depth_path` and `mono_normal_path` to
+`meta_data.json`, set `has_mono_prior` to `true`, and enable prior loading only
+after the files are available. Training without priors is not equivalent to the
+paper's prior-augmented configurations.
 
 ## Geometry references
 
@@ -60,12 +80,12 @@ download corruption, not camera calibration or evaluation equivalence.
 
 ## Dataset terms
 
-Scene1, Scene3 and Scene4 are author-collected. No public dataset licence is
-granted in this distribution; access is restricted and redistribution requires
-the owner's permission. Scene1-HR follows Scene1's terms.
+Scene1, Scene3 and Scene4 are author-collected. No general reuse or redistribution
+licence is granted for these data; contact the authors for permission.
+Scene1-HR and the author-collected geometry references follow the same terms.
 
 Scene2 derives from NeRFBK Doss Trento. Preserve CC BY-NC-SA 4.0 attribution,
 modification notices and source terms in [SCENE2_ATTRIBUTION.md](SCENE2_ATTRIBUTION.md)
-and the archive. This source licence does not establish redistribution rights
-for added monocular priors; the combined archive remains access-restricted.
+and the archive. The redistributed Scene2 RGB subset and reference geometry
+remain subject to those source terms. Omnidata-generated priors are omitted.
 The code's Apache-2.0 licence does not override dataset terms.

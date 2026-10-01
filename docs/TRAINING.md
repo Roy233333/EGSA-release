@@ -31,9 +31,12 @@ fixed when comparing samplers. In the same training command, change only:
 
 Keep `--data` pointed at the actual extracted scene directory containing
 `meta_data.json`, wherever it is stored.
-Scene1, Scene2 and Scene3 include monocular depth/normal priors; use
-`--include-mono-prior True` only with a model/loss configuration that uses them.
-Scene1-HR and Scene4 have no such priors: use `--include-mono-prior False`.
+The distributed archives do not include monocular depth/normal priors. Use
+`--include-mono-prior False` with a backbone/loss configuration that does not
+require them. For prior-augmented experiments on Scene1, Scene2 or Scene3,
+generate the Omnidata v2 priors locally and update the metadata before enabling
+`--include-mono-prior True`; see [monocular priors](DATASETS.md#monocular-priors).
+Scene1-HR and Scene4 use no monocular priors.
 Use `--load-pairs False` for the released datasets.
 
 Available SDF backbones include `neus`, `neus-facto`, `neus-facto-angelo`,
