@@ -3,18 +3,25 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Optional
 
 import torch
 
 
 @dataclass(frozen=True)
 class SparseEMAResult:
-    """Unique updated coordinates and their old/new values."""
+    """Unique updated coordinates and their old/new hardness values.
+
+    ``probability_delta``, when supplied by ``update_sampler_image_state``,
+    is the float64 difference of the actual stored pixel-importance values.
+    The existing ``delta`` property continues to describe hardness changes.
+    """
 
     y: torch.Tensor
     x: torch.Tensor
     old: torch.Tensor
     new: torch.Tensor
+    probability_delta: Optional[torch.Tensor] = None
 
     @property
     def delta(self) -> torch.Tensor:
@@ -140,5 +147,10 @@ def update_sampler_image_state(
     if result.y.numel() == 0:
         return result
 
+    # Form the mass delta from the values actually stored in q, not from
+    # prior * (new_h - old_h): these differ after float32 rounding. Only
+    # unique visited pixels are gathered, so no full-map rescan is needed.
+    old_probability = probability[result.y, result.x].double()
     probability[result.y, result.x] = prior[result.y, result.x] * result.new
-    return result
+    probability_delta = probability[result.y, result.x].double() - old_probability
+    return SparseEMAResult(result.y, result.x, result.old, result.new, probability_delta)

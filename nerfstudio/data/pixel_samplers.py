@@ -288,10 +288,10 @@ class AdaptivePixelSampler(PixelSampler):
         self.prior_maps: Dict[int, torch.Tensor] = {}  # (H,W)
         self.loss_weights: Dict[int, torch.Tensor] = {}  # (H,W)
         self.prob_maps: Dict[int, torch.Tensor] = {}   # (H,W)
-        self.prob_sums: Dict[int, float] = {}          # scalar
+        self.prob_sums: Dict[int, float] = {}          # float64 scalar mass
 
         # Block level
-        self.block_sums: Dict[int, torch.Tensor] = {}  # (Hc,Wc)
+        self.block_sums: Dict[int, torch.Tensor] = {}  # (Hc,Wc) float64 masses
         self.block_shape: Dict[int, Tuple[int, int]] = {}
         self.shape_hw: Dict[int, Tuple[int, int]] = {}
 
@@ -338,7 +338,7 @@ class AdaptivePixelSampler(PixelSampler):
         # hardness & prob
         h = torch.ones_like(prior)
         q = prior * h
-        Z = float(q.sum().item())
+        Z = float(q.sum(dtype=torch.float64).item())
 
         self.loss_weights[gid] = h
         self.prob_maps[gid] = q
@@ -357,7 +357,7 @@ class AdaptivePixelSampler(PixelSampler):
         pad_h = Hc * s - H
         pad_w = Wc * s - W
         q_pad = F.pad(q, (0, pad_w, 0, pad_h))
-        q_cells = q_pad.view(Hc, s, Wc, s).sum(3).sum(1).contiguous()
+        q_cells = q_pad.view(Hc, s, Wc, s).sum(3, dtype=torch.float64).sum(1).contiguous()
         self.block_sums[gid] = q_cells
         self.block_shape[gid] = (Hc, Wc)
 
@@ -424,7 +424,7 @@ class AdaptivePixelSampler(PixelSampler):
             mask_hw = self._extract_mask_full(image_batch, b)
             self._ensure_state(gid, imgs_cpu[b], mask_hw)
             masses.append(self.prob_sums[gid])
-        masses_t = torch.tensor(masses, dtype=torch.float32)
+        masses_t = torch.tensor(masses, dtype=torch.float64)
         masses_t = masses_t / max(masses_t.sum().item(), 1e-12)
         if self.uniform_mix > 0:
             masses_t = (1 - self.uniform_mix) * masses_t + self.uniform_mix * (torch.ones_like(masses_t) / B)
@@ -584,9 +584,10 @@ class AdaptivePixelSampler(PixelSampler):
             if self.feedback_update_calls == 0:
                 absolute_hardness_delta += float(result.delta.abs().sum().item())
 
-            # q = prior * hardness, so each unique pixel contributes exactly
-            # one probability-mass delta even when sampled repeatedly.
-            dq = prior[result.y, result.x] * result.delta
+            # Accumulate in float64 using the actual stored q changes.
+            # Each unique pixel contributes once, even after repeated hits.
+            dq = result.probability_delta
+            assert dq is not None
             self.prob_sums[gid_i] = float(max(self.prob_sums[gid_i] + dq.sum().item(), 1e-12))
 
             self._update_block_sums_incremental(gid_i, result.y, result.x, dq)

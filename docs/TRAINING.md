@@ -53,3 +53,13 @@ does not restore the exact sampling history. Use fixed-resolution image batches;
 the recommended block size 8 divides all released image dimensions. Other block
 sizes can produce clamped-border sampling bias when dimensions are not divisible.
 Foreground masks are not enforced in every adaptive sampling branch.
+
+Pixel hardness and importance maps use float32. Image and cell importance
+masses are initialised from the stored pixel importance values using float64
+reductions, then maintained by float64 incremental updates. Each unique visited
+pixel contributes the difference between its actual stored new and old
+importance values; repeated observations still obey the sequential EMA rule.
+This avoids accumulating a separately rounded `prior * hardness_delta`.
+Image masses retain the existing lower bound of `1e-12` for sampling.
+Floating-point roundoff is reduced, not eliminated, and no periodic
+full-resolution recomputation is performed.

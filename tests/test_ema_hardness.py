@@ -95,8 +95,43 @@ def test_disabled_update_is_noop():
     assert result.y.numel() == 0
 
 
+def test_mass_delta_uses_stored_probability_values():
+    """An algebraic prior*dh delta need not equal rounded new_q-old_q."""
+    hardness = torch.ones((2, 3), dtype=torch.float32)
+    prior = torch.tensor([[0.1234567, 0.8765432, 1e-8], [0.4, 0.01, 0.9]])
+    probability = prior * hardness
+    before = probability.clone()
+    result = EMA.update_sampler_image_state(
+        hardness=hardness, prior=prior, probability=probability,
+        y=torch.tensor([0, 0, 1, 0]), x=torch.tensor([0, 0, 2, 1]),
+        per_ray_loss=torch.tensor([1e-8, 2e-8, 3e-8, 4e-8]), decay=0.9,
+    )
+    expected = probability[result.y, result.x].double() - before[result.y, result.x].double()
+    assert result.probability_delta is not None
+    assert result.probability_delta.dtype == torch.float64
+    torch.testing.assert_close(result.probability_delta, expected, rtol=0, atol=0)
+    torch.testing.assert_close(result.delta, result.new - result.old, rtol=0, atol=0)
+    assert result.y.numel() == 3
+
+
+def test_disabled_probability_update_is_noop():
+    hardness = torch.ones((2, 2))
+    probability = torch.ones_like(hardness)
+    result = EMA.update_sampler_image_state(
+        hardness=hardness, prior=torch.ones_like(hardness), probability=probability,
+        y=torch.tensor([0]), x=torch.tensor([0]), per_ray_loss=torch.tensor([0.1]),
+        decay=0.9, enabled=False,
+    )
+    assert result.y.numel() == 0
+    assert result.probability_delta is None
+    assert bool(torch.all(hardness == 1))
+    assert bool(torch.all(probability == 1))
+
+
 if __name__ == "__main__":
     test_sparse_ema_matches_sequential_reference()
     test_probability_map_stays_consistent()
     test_disabled_update_is_noop()
+    test_mass_delta_uses_stored_probability_values()
+    test_disabled_probability_update_is_noop()
     print("EMA numerical checks passed")
