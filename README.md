@@ -1,14 +1,15 @@
 # EGSA: Edge-Guided Supervision Allocation for Neural Surface Reconstruction in Architectural Scenes
 
 EGSA redistributes a fixed ray budget using image-space edges and
-EMA-smoothed photometric error. It changes supervision sampling while retaining
+an EMA of detached per-observation RGB MSE. It changes supervision sampling while retaining
 the SDF-based neural representation, rendering model and per-ray training losses.
 
-![EGSA framework: edge-guided allocation and photometric-error feedback](assets/overview.png)
+![EGSA framework: edge-guided allocation, backbone training, and detached RGB MSE feedback](assets/overview.png)
 
-*Framework overview from the paper. The network panel is schematic: SDF-based
-backbones obtain rendering density or opacity from a signed-distance field.
-The figure's numbered references refer to figures in the paper.*
+*EGSA framework (Figure 3): adaptive sampling, backbone training, detached
+RGB MSE feedback, and surface extraction after training. Backbone losses
+update the model; detached RGB MSE updates the sampler. The figure's numbered
+references refer to figures in the paper.*
 
 ## Installation
 
